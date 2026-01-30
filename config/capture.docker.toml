@@ -1,0 +1,33 @@
+# NetSentinel Capture Configuration - Docker
+# This config is used inside the Docker container
+
+[capture]
+mode = "mirror"
+ring_buffer_size = 8192
+snap_length = 1518
+flush_interval_ms = 100
+batch_size = 1000
+
+# Default interface - override with CAPTURE_INTERFACE env var
+[[capture.interfaces]]
+name = "eth0"
+promiscuous = true
+description = "Primary monitoring interface"
+
+[redis]
+# Use environment variable REDIS_URL or default
+url = "redis://127.0.0.1:6379"
+stream_name = "netsentinel:frames"
+max_stream_length = 100000
+pool_size = 4
+
+[logging]
+level = "info"
+file = "/dev/null"
+stdout = true
+format = "json"
+
+[metrics]
+enabled = true
+port = 9100
+path = "/metrics"

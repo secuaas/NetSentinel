@@ -1,0 +1,126 @@
+# NetSentinel - Docker Compose for embedded Debian deployment
+# Usage: docker-compose up -d
+
+version: '3.8'
+
+services:
+  # ===========================================
+  # Infrastructure
+  # ===========================================
+
+  postgres:
+    image: timescale/timescaledb:latest-pg16
+    container_name: netsentinel-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: netsentinel
+      POSTGRES_USER: netsentinel
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-netsentinel_secret}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./migrations:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U netsentinel -d netsentinel"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - netsentinel
+
+  redis:
+    image: redis:7-alpine
+    container_name: netsentinel-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - netsentinel
+
+  # ===========================================
+  # NetSentinel Services
+  # ===========================================
+
+  capture:
+    build:
+      context: .
+      target: capture
+    container_name: netsentinel-capture
+    restart: unless-stopped
+    network_mode: host
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    volumes:
+      - ./config/capture.toml:/etc/netsentinel/capture.toml:ro
+    environment:
+      REDIS_URL: redis://127.0.0.1:6379
+      RUST_LOG: info
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  aggregator:
+    build:
+      context: .
+      target: aggregator
+    container_name: netsentinel-aggregator
+    restart: unless-stopped
+    volumes:
+      - ./config/aggregator.toml:/etc/netsentinel/aggregator.toml:ro
+    environment:
+      REDIS_URL: redis://redis:6379
+      DATABASE_URL: postgres://netsentinel:${DB_PASSWORD:-netsentinel_secret}@postgres:5432/netsentinel
+      RUST_LOG: info
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - netsentinel
+
+  api:
+    build:
+      context: .
+      target: api
+    container_name: netsentinel-api
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgres://netsentinel:${DB_PASSWORD:-netsentinel_secret}@postgres:5432/netsentinel
+      REDIS_URL: redis://redis:6379
+      SECRET_KEY: ${SECRET_KEY:-change_me_in_production}
+      DEBUG: "false"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - netsentinel
+
+  web:
+    build:
+      context: .
+      target: web
+    container_name: netsentinel-web
+    restart: unless-stopped
+    ports:
+      - "${WEB_PORT:-8080}:80"
+    depends_on:
+      - api
+    networks:
+      - netsentinel
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  netsentinel:
+    driver: bridge

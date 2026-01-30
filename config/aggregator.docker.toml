@@ -1,0 +1,40 @@
+# NetSentinel Aggregator Configuration - Docker
+# This config is used inside the Docker container
+
+[redis]
+# Use environment variable REDIS_URL
+url = "redis://redis:6379"
+stream_name = "netsentinel:frames"
+consumer_group = "aggregator"
+consumer_name = "aggregator-1"
+batch_size = 100
+block_timeout_ms = 1000
+
+[database]
+# Use environment variable DATABASE_URL
+url = "postgresql://netsentinel:netsentinel_secret@postgres:5432/netsentinel"
+pool_size = 10
+connect_timeout = 30
+
+[aggregation]
+persist_interval = 60
+metrics_bucket = "1 minute"
+inactivity_timeout = 300
+flow_timeout = 120
+
+[events]
+channel = "netsentinel:events"
+publish_new_devices = true
+publish_new_flows = true
+publish_alerts = true
+
+[logging]
+level = "info"
+file = "/dev/null"
+stdout = true
+format = "json"
+
+[metrics]
+enabled = true
+port = 9101
+path = "/metrics"
