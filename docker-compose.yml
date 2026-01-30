@@ -92,10 +92,10 @@ services:
     container_name: netsentinel-api
     restart: unless-stopped
     environment:
-      DATABASE_URL: postgres://netsentinel:${DB_PASSWORD:-netsentinel_secret}@postgres:5432/netsentinel
-      REDIS_URL: redis://redis:6379
-      SECRET_KEY: ${SECRET_KEY:-change_me_in_production}
-      DEBUG: "false"
+      NETSENTINEL_DATABASE_URL: postgresql+asyncpg://netsentinel:${DB_PASSWORD:-netsentinel_secret}@postgres:5432/netsentinel
+      NETSENTINEL_REDIS_URL: redis://redis:6379
+      NETSENTINEL_SECRET_KEY: ${SECRET_KEY:-change_me_in_production}
+      NETSENTINEL_DEBUG: "false"
     depends_on:
       postgres:
         condition: service_healthy
