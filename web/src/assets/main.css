@@ -1,0 +1,84 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply antialiased;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-dark-100 rounded-lg border border-gray-700 p-4;
+  }
+
+  .btn {
+    @apply px-4 py-2 rounded-lg font-medium transition-colors duration-200;
+  }
+
+  .btn-primary {
+    @apply bg-primary-600 hover:bg-primary-700 text-white;
+  }
+
+  .btn-secondary {
+    @apply bg-gray-700 hover:bg-gray-600 text-white;
+  }
+
+  .input {
+    @apply bg-dark-200 border border-gray-600 rounded-lg px-3 py-2 text-gray-100
+           focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none;
+  }
+
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .badge-success {
+    @apply bg-green-900/50 text-green-400;
+  }
+
+  .badge-warning {
+    @apply bg-yellow-900/50 text-yellow-400;
+  }
+
+  .badge-danger {
+    @apply bg-red-900/50 text-red-400;
+  }
+
+  .badge-info {
+    @apply bg-blue-900/50 text-blue-400;
+  }
+
+  .table-row {
+    @apply border-b border-gray-700 hover:bg-dark-200/50 transition-colors;
+  }
+}
+
+/* vis-network customization */
+.vis-network {
+  background-color: #0f172a;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1e293b;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
