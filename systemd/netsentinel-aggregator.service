@@ -1,0 +1,30 @@
+[Unit]
+Description=NetSentinel Data Aggregator Service
+After=network.target redis.service postgresql.service netsentinel-capture.service
+Requires=redis.service postgresql.service
+Documentation=https://github.com/secuaas/NetSentinel
+
+[Service]
+Type=simple
+User=netsentinel
+Group=netsentinel
+ExecStart=/opt/netsentinel/bin/netsentinel-aggregator --config /opt/netsentinel/config/aggregator.toml
+Restart=always
+RestartSec=5
+
+# Security
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/var/log/netsentinel
+PrivateTmp=yes
+
+# Resource limits
+LimitNOFILE=65535
+
+# Environment
+Environment=RUST_LOG=info
+Environment=RUST_BACKTRACE=1
+
+[Install]
+WantedBy=multi-user.target

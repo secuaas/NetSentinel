@@ -1,0 +1,68 @@
+# NetSentinel Aggregator Configuration
+# /opt/netsentinel/config/aggregator.toml
+
+[redis]
+# Redis connection URL
+url = "redis://127.0.0.1:6379"
+
+# Stream name to consume from
+stream_name = "netsentinel:frames"
+
+# Consumer group name
+consumer_group = "aggregator"
+
+# Consumer name (unique per instance)
+consumer_name = "aggregator-1"
+
+# Batch size for reading from stream
+batch_size = 100
+
+# Block timeout when reading (milliseconds)
+block_timeout_ms = 1000
+
+[database]
+# PostgreSQL connection URL
+url = "postgresql://netsentinel:devpassword@127.0.0.1:5432/netsentinel"
+
+# Connection pool size
+pool_size = 10
+
+# Connection timeout (seconds)
+connect_timeout = 30
+
+[aggregation]
+# Persist interval for devices/flows (seconds)
+persist_interval = 60
+
+# Metrics bucket size
+metrics_bucket = "1 minute"
+
+# Device inactivity timeout (seconds) - mark as inactive after this
+inactivity_timeout = 300
+
+# Flow timeout (seconds) - close flow after no packets
+flow_timeout = 120
+
+[events]
+# Redis channel for real-time events
+channel = "netsentinel:events"
+
+# Publish new device events
+publish_new_devices = true
+
+# Publish new flow events
+publish_new_flows = true
+
+# Publish threshold alerts
+publish_alerts = true
+
+[logging]
+level = "info"
+file = "/var/log/netsentinel/aggregator.log"
+stdout = true
+format = "pretty"
+
+[metrics]
+enabled = true
+port = 9101
+path = "/metrics"

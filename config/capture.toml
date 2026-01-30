@@ -1,0 +1,72 @@
+# NetSentinel Capture Configuration
+# /opt/netsentinel/config/capture.toml
+
+[capture]
+# Capture mode: "mirror" (SPAN/TAP) or "bypass" (inline bridge)
+mode = "mirror"
+
+# AF_PACKET ring buffer size (number of frames)
+ring_buffer_size = 8192
+
+# Maximum frame size to capture (bytes)
+snap_length = 1518
+
+# Interval to flush buffered frames to Redis (milliseconds)
+flush_interval_ms = 100
+
+# Number of frames to batch before sending to Redis
+batch_size = 1000
+
+# Network interfaces to monitor
+[[capture.interfaces]]
+name = "lo"
+promiscuous = false
+description = "Loopback interface (for testing)"
+
+# Production example:
+# [[capture.interfaces]]
+# name = "ens3"
+# promiscuous = true
+# description = "Primary monitoring interface"
+
+# Uncomment for secondary interface
+# [[capture.interfaces]]
+# name = "eth1"
+# promiscuous = true
+# description = "Secondary monitoring interface"
+
+[redis]
+# Redis connection URL
+url = "redis://127.0.0.1:6379"
+
+# Stream name for captured frames
+stream_name = "netsentinel:frames"
+
+# Maximum stream length (oldest entries trimmed when exceeded)
+max_stream_length = 100000
+
+# Connection pool size
+pool_size = 4
+
+[logging]
+# Log level: trace, debug, info, warn, error
+level = "info"
+
+# Log file path
+file = "/var/log/netsentinel/capture.log"
+
+# Log to stdout in addition to file
+stdout = true
+
+# Log format: json or pretty
+format = "pretty"
+
+[metrics]
+# Enable Prometheus metrics endpoint
+enabled = true
+
+# Metrics port
+port = 9100
+
+# Metrics path
+path = "/metrics"
