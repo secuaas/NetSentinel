@@ -4,7 +4,7 @@
 # ============================================================
 # Stage 1: Rust Builder
 # ============================================================
-FROM rust:1.75-slim-bookworm AS rust-builder
+FROM rust:latest AS rust-builder
 
 RUN apt-get update && apt-get install -y \
     pkg-config \
